@@ -4,24 +4,24 @@ import com.collectibles.utils.JsonUtil;
 import static spark.Spark.*;
 import java.util.Map;
 
+/**
+ * Handles all API routes under /api/users
+ */
 public class UserController {
 
     private final UserService userService;
 
-    // <<< CORRECCIÓN AQUÍ >>>
-    // El constructor ahora solo guarda el servicio.
     public UserController(UserService userService) {
+        // Constructor now only stores the service
         this.userService = userService;
     }
 
     /**
-     * <<< CORRECIÓN AQUÍ >>>
-     * Este es el nuevo método público que App.java llamará
-     * DESPUÉS de haber creado el grupo /api.
+     * This public method is called by App.java
+     * to register all routes for this controller *inside* the /api path.
      */
     public void registerRoutes() {
         
-        // Grupo de rutas para /users (será /api/users)
         path("/users", () -> {
 
             // GET /api/users
