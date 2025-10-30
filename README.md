@@ -35,11 +35,11 @@ Follow these steps to run the server locally.
     ```
 4.  The server will be active and listening on `http://localhost:8080`.
 
-### ![alt text](image-2.png)
+
 
 Here you can see the terminal confirmation that the server has started successfully:
 
-> *(Paste your terminal screenshot here, showing the "Servidor API de Coleccionables iniciado..." message)*
+> ### ![alt text](image-2.png)
 >
 > ``
 
