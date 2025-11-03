@@ -222,3 +222,33 @@ All API routes are prefixed with `/api` and continue to function alongside the w
 ## 📁 Updated Project Structure (Sprint 2)
 
 The project structure was expanded to include the web layer (`WebController`), a new `offer` module, exception handling, and resource folders for templates and static files.
+
+# Sprint 3 Updates: Filters & Real-Time WebSockets
+
+This document details the new features implemented during Sprint 3, building upon the foundation of Sprints 1 and 2.
+
+## ✅ Sprint 3 Functionality: Filters & WebSockets
+
+This sprint added dynamic filtering and real-time communication.
+
+### Price Filters (Req 3.1)
+
+The homepage (`index.mustache`) now includes a form to filter items by a price range (min and max). The `WebController` (Java) receives these query parameters (`?minPrice=...`) and filters the list using the `ItemService` before rendering the template.
+
+> ![alt text](image-14.png)
+>
+> ``
+
+### Real-Time Price Updates (Req 3.2)
+
+Implemented WebSockets for a live "auction" experience. When a user submits a new offer, that amount becomes the new price for the item. The server (using `PriceUpdateWebSocketHandler`) then broadcasts this new price to **all** connected clients viewing that item, updating the price on their screens instantly without a page reload.
+
+> ![alt text](image-15.png)
+>![alt text](image-16.png)
+> ``
+
+---
+
+## 📁 Updated Project Structure (Sprint 3)
+
+The project structure was expanded to include the new `websocket` module and key files were modified.

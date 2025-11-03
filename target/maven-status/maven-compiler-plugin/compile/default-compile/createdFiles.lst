@@ -7,6 +7,7 @@ com\collectibles\item\Item.class
 com\collectibles\user\UserService$UserDTO.class
 com\collectibles\WebController.class
 com\collectibles\offer\OfferService.class
+com\collectibles\websocket\PriceUpdateWebSocketHandler.class
 com\collectibles\utils\JsonUtil.class
 com\collectibles\item\ItemService$1.class
 com\collectibles\user\UserController.class

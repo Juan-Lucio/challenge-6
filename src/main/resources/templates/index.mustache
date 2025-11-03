@@ -14,6 +14,23 @@
         </div>
     </header>
     <main class="container">
+        
+        <div class="filter-container">
+            <h2>Filter Collection</h2>
+            <form action="/" method="GET" class="filter-form">
+                <div class="form-group">
+                    <label for="minPrice">Min Price ($):</label>
+                    <input type="number" id="minPrice" name="minPrice" 
+                           class="form-control" placeholder="0" 
+                           value="{{minPrice}}"> </div>
+                <div class="form-group">
+                    <label for="maxPrice">Max Price ($):</label>
+                    <input type="number" id="maxPrice" name="maxPrice" 
+                           class="form-control" placeholder="9999" 
+                           value="{{maxPrice}}"> </div>
+                <button type="submit" class="submit-button filter-button">Apply Filters</button>
+            </form>
+        </div>
         <h2>Curated Collection</h2>
         <div class="item-grid">
             {{#items}}
@@ -27,6 +44,10 @@
                     <span class="view-details-btn">View Details</span>
                 </div>
             </a>
+            {{/items}}
+            
+            {{^items}}
+            <p class="no-offers">No items match your filter criteria.</p>
             {{/items}}
         </div>
     </main>

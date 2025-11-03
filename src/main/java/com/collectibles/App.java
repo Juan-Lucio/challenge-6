@@ -3,14 +3,15 @@ package com.collectibles;
 import com.collectibles.exception.NotFoundException;
 import com.collectibles.item.ItemController;
 import com.collectibles.item.ItemService;
-// --- (NUEVO IMPORT) ---
 import com.collectibles.offer.OfferService;
 import com.collectibles.user.UserController;
 import com.collectibles.user.UserService;
 import com.collectibles.utils.JsonUtil;
+// --- NUEVO IMPORT PARA WEBSOCKET ---
+import com.collectibles.websocket.PriceUpdateWebSocketHandler;
+// ---
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
-
 import java.util.Map;
 import static spark.Spark.*;
 
@@ -20,33 +21,31 @@ public class App {
         staticFiles.location("/public");
         port(8080);
 
+        // --- SPRINT 3.2: INICIALIZAR WEBSOCKET ---
+        // Register the WebSocket handler at the /ws/price-updates path
+        webSocket("/ws/price-updates", PriceUpdateWebSocketHandler.class);
+        // ---
+
         MustacheTemplateEngine templateEngine = new MustacheTemplateEngine();
 
-        // 2. Inyección de Dependencias
         ItemService itemService = new ItemService();
         UserService userService = new UserService();
-        // --- (NUEVO SERVICIO) ---
         OfferService offerService = new OfferService();
         
-        // 3. Creación de Controladores
         ItemController itemController = new ItemController(itemService);
         UserController userController = new UserController(userService);
-        
-        // --- (CONSTRUCTOR ACTUALIZADO) ---
-        // Inject all three services into the WebController
         WebController webController = new WebController(itemService, offerService, templateEngine);
 
 
-        // --- SPRINT 1: API Routes ---
         path("/api", () -> {
             itemController.registerRoutes();
             userController.registerRoutes();
         });
 
-        // --- SPRINT 2: Web Routes ---
         webController.registerRoutes();
 
-        // ... (El resto del archivo, manejadores de excepciones, etc., no cambia) ...
+
+        // --- MANEJADORES DE EXCEPCIONES Y FILTROS (SIN CAMBIOS) ---
         
         after("/api/*", (req, res) -> {
             if (res.type() == null) {
