@@ -107,7 +107,7 @@ During the development of this sprint, the following key decisions were made to 
 
 This repository contains the source code for **Sprint 1 and 2** of the collectible item sales project, developed with Java and the Spark framework.
 
-Sprint 1 built the core RESTful API. **Sprint 2 adds the functional, user-facing website** using Mustache templates, exception handling, and web forms.
+Sprint 1 built the core RESTful API. **Sprint 2 adds the functional, user-facing website**, featuring an elegant design with images, Mustache templates, exception handling, and a form system for making offers.
 
 ## 🛠️ Tech Stack
 
@@ -143,7 +143,7 @@ Follow these steps to run the server locally.
 
 Here you can see the terminal confirmation that the server has started successfully:
 
-![alt text](image-3.png)
+> ![alt text](image-8.png)
 >
 > ``
 
@@ -151,39 +151,48 @@ Here you can see the terminal confirmation that the server has started successfu
 
 ## ✅ Sprint 2 Functionality & Tests
 
-Sprint 2 implemented the user-facing website, exception handling, and form processing.
+Sprint 2 implemented the user-facing website, a new visual design, an offer management system, and exception handling.
 
-### Homepage (GET /)
+### New Homepage (GET /)
 
-The homepage (`index.mustache`) now renders a list of all available items from the `ItemService`.
+The homepage (`index.mustache`) now renders a professional grid of all available items, pulling images and data from the `items.json` file.
 
-> ![alt text](image-4.png)
+> ![alt text](image-9.png)
 >
 > ``
 
 ### Item Detail & Offer Form (GET /:id)
 
-Clicking an item leads to its detail page (`item.mustache`), which displays the item's description and the new web form for making offers.
+The item detail page (`item.mustache`) features a large image, a detailed description, and a redesigned form for making offers.
 
-> ![alt text](image-5.png)
+> ![alt text](image-10.png)
 >
 > ``
 
-### Form Submission (POST /:id/offer)
+### Offer Submission & Persistence (POST /:id/offer)
 
-Submitting the form triggers a POST request. The server logs the offer to the console and uses the Post-Redirect-Get (PRG) pattern to safely reload the page.
+Submitting the form (now including an email) creates a new `Offer` object, which is stored in the `OfferService`. The server then logs the offer and redirects.
 
-> ![alt text](image-6.png)
+> ![alt text](image-11.png)
+>
+> ``
+
+### Offer List Display
+
+The item detail page now queries the `OfferService` and displays a list of all current offers for that specific item.
+
+> ![alt text](image-12.png)
 >
 > ``
 
 ### Custom Exception Handling (404)
 
-Accessing a non-existent item (e.g., `/fake-item`) now throws a `NotFoundException` and renders the custom `404.mustache` template.
+Accessing a non-existent item (e.g., `/fake-item`) throws a `NotFoundException` and renders the custom, styled `404.mustache` template.
 
-> ![alt text](image-7.png)
+> ![alt text](image-13.png)
 >
 > ``
+
 ---
 
 ## 🗺️ API Endpoints (Sprint 1)
@@ -212,4 +221,4 @@ All API routes are prefixed with `/api` and continue to function alongside the w
 
 ## 📁 Updated Project Structure (Sprint 2)
 
-The project structure was expanded to include the web layer (`WebController`), exception handling, and resource folders for templates and static files.
+The project structure was expanded to include the web layer (`WebController`), a new `offer` module, exception handling, and resource folders for templates and static files.
