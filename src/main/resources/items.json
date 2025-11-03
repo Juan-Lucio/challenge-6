@@ -1,44 +1,51 @@
 [
   {
     "id": "item1",
-    "name": "Gorra autografiada por Peso Pluma",
-    "description": "Una gorra autografiada por el famoso Peso Pluma.",
-    "price": "$621.34 USD"
+    "name": "Casco autografiado por Rosalía",
+    "description": "Casco utilizado por Rosalía durante su gira 'Motomami', autografiado en persona.",
+    "price": "734.57",
+    "imageUrl": "https://dwgyu36up6iuz.cloudfront.net/heru80fdn/image/upload/c_fill,d_placeholder_voguespain.png,fl_progressive,g_face,h_1080,q_80,w_1920/v1727877556/voguespain_pepa-salazar-asi-creo-el-iconico-casco-de-rosalia-para-motomami-vogue-backstage.jpg"
   },
   {
     "id": "item2",
-    "name": "Casco autografiado por Rosalía",
-    "description": "Un casco autografiado por la famosa cantante Rosalía, una verdadera MOTOMAMI!",
-    "price": "$734.57 USD"
+    "name": "Gorra autografiada por Peso Pluma",
+    "description": "Gorra exclusiva usada y firmada por Peso Pluma en uno de sus conciertos más emblemáticos.",
+    "price": "621.34",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPFK-pSE_UkGWY8NWRzzapVy6-kmiwF3zArQ&s"
   },
   {
     "id": "item3",
-    "name": "Chamarra de Bad Bunny",
-    "description": "Una chamarra de la marca favorita de Bad Bunny, autografiada por el propio artista.",
-    "price": "$521.89 USD"
+    "name": "Guitarra autografiada por Coldplay",
+    "description": "Una de las guitarras utilizadas por Chris Martin en la gira 'Music of the Spheres', firmada por toda la banda.",
+    "price": "458.91",
+    "imageUrl": "https://i.redd.it/i-genuinely-love-how-chris-painted-his-acoustic-guitars-v0-p0h4b45rkw6e1.jpg?width=1080&format=pjpg&auto=webp&s=215d0b833d8eeeb1e12cc51d3b058fe3f61ec395"
   },
   {
     "id": "item4",
     "name": "Guitarra de Fernando Delgadillo",
-    "description": "Una guitarra acústica de alta calidad utilizada por el famoso cantautor Fernando Delgadillo.",
-    "price": "$823.12 USD"
+    "description": "Guitarra acústica personal de Fernando Delgadillo, utilizada en varias presentaciones íntimas.",
+    "price": "823.12",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVqDLOrYqnpKqBEKNw2rG2wfZjKv_x3tuaUQ&s"
   },
   {
     "id": "item5",
-    "name": "Jersey firmado por Snoop Dogg",
-    "description": "Un jersey autografiado por el legendario rapero Snoop Dogg.",
-    "price": "$355.67 USD"
+    "name": "Chamarra de Bad Bunny",
+    "description": "Chamarra icónica de una edición limitada, usada por Bad Bunny en su video musical.",
+    "price": "521.89",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX1dNJXuk-cwHRds0RDDuQKWz-rWlh-GkRZA&s"
   },
   {
     "id": "item6",
     "name": "Prenda de Cardi B autografiada",
-    "description": "Un crop-top usado y autografiado por la famosa rapera Cardi B. en su última visita a México",
-    "price": "$674.23 USD"
+    "description": "Vestido de diseñador usado por Cardi B en los MTV Video Music Awards, firmado con dedicatoria.",
+    "price": "674.23",
+    "imageUrl": "https://media.vogue.mx/photos/650101818adc2b9504f3af0a/2:3/w_2560%2Cc_limit/Cardi-B-alfombra-roja-premios-MTV-VMAs-2023-GettyImages-1676924849.jpg"
   },
   {
     "id": "item7",
-    "name": "Guitarra autografiada por Coldplay",
-    "description": "Una guitarra eléctrica autografiada por la popular banda británica Coldplay, un día antes de su concierto en Monterrey en 2022.",
-    "price": "$458.91 USD"
+    "name": "Jersey firmado por Snoop Dogg",
+    "description": "Jersey de baloncesto edición especial, autografiado por el legendario Snoop Dogg en un evento benéfico.",
+    "price": "355.67",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLdyU0NPWBi95sR1dAMQ9CECpbMKSk2ShkRQ&s"
   }
 ]

@@ -2,32 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{item.name}}</title>
+    <title>{{item.name}} - Collector's Vault</title>
     <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <a href="/" class="back-link">&larr; Back to List</a>
-        <h1>{{item.name}}</h1>
+        <div class="header-content container">
+            <a href="/" class="back-link">&larr; Back to Collection</a>
+            <h1>{{item.name}}</h1>
+        </div>
     </header>
-    <main class="container">
-        <div class="item-detail">
-            <p>{{item.description}}</p>
-            <h3>Price: {{item.price}}</h3>
-            
-            <hr>
+    <main class="container item-detail-page">
+        <div class="item-main-info">
+            <div class="item-image-large">
+                <img src="{{item.imageUrl}}" alt="{{item.name}}">
+            </div>
+            <div class="item-text-info">
+                <p class="item-description">{{item.description}}</p>
+                <h3 class="current-price">Current Value: <span id="item-price">{{item.price}} USD</span></h3>
+                
+                <hr>
 
-            <h2>Make an Offer</h2>
-            <form action="/{{item.id}}/offer" method="POST">
-                <label for="offerAmount">Offer Amount (USD):</label>
-                <input type="number" id="offerAmount" name="offerAmount" step="0.01" min="0" required>
+                <div class="offer-section">
+                    <h2>Make an Offer</h2>
+                    <form action="/{{item.id}}/offer" method="POST" class="offer-form">
+                        <div class="form-group">
+                            <label for="offerAmount">Your Offer (USD):</label>
+                            <input type="number" id="offerAmount" name="offerAmount" step="0.01" min="0" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bidderName">Your Name:</label>
+                            <input type="text" id="bidderName" name="bidderName" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bidderEmail">Your Email:</label>
+                            <input type="email" id="bidderEmail" name="bidderEmail" required class="form-control">
+                        </div>
+                        
+                        <button type="submit" class="submit-button">Submit Offer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="offer-list-section">
+            <h2>Current Bids</h2>
+            <div class="offers-container">
+                {{#offers}}
+                <div class="offer-card">
+                    <p class="offer-amount"><strong>${{amount}}</strong></p>
+                    <p class="offer-bidder">From: {{name}}</p>
+                    <p class="offer-email">({{email}})</p>
+                </div>
+                {{/offers}}
                 
-                <label for="bidderName">Your Name:</label>
-                <input type="text" id="bidderName" name="bidderName" required>
-                
-                <button type="submit">Submit Offer</button>
-            </form>
+                {{^offers}}
+                <p class="no-offers">No bids yet. Be the first to make an offer!</p>
+                {{/offers}}
+            </div>
         </div>
     </main>
+    <footer>
+        <p>&copy; 2023 Collector's Vault. All rights reserved.</p>
+    </footer>
 </body>
 </html>

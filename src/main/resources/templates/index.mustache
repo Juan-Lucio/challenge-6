@@ -4,21 +4,34 @@
     <meta charset="UTF-8">
     <title>Collectible Store</title>
     <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Welcome to the Collectible Store</h1>
+        <div class="header-content container">
+            <h1>Collector's Vault</h1>
+            <p>Your premier destination for unique memorabilia.</p>
+        </div>
     </header>
     <main class="container">
-        <h2>Available Items</h2>
+        <h2>Curated Collection</h2>
         <div class="item-grid">
             {{#items}}
             <a href="/{{id}}" class="item-card">
-                <h3>{{name}}</h3>
-                <p>{{price}}</p>
+                <div class="item-image-wrapper">
+                    <img src="{{imageUrl}}" alt="{{name}}" class="item-thumbnail">
+                </div>
+                <div class="item-info">
+                    <h3>{{name}}</h3>
+                    <p class="item-price">{{price}} USD</p>
+                    <span class="view-details-btn">View Details</span>
+                </div>
             </a>
             {{/items}}
         </div>
     </main>
+    <footer>
+        <p>&copy; 2023 Collector's Vault. All rights reserved.</p>
+    </footer>
 </body>
 </html>
