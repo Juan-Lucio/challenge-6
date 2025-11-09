@@ -249,6 +249,58 @@ Implemented WebSockets for a live "auction" experience. When a user submits a ne
 
 ---
 
-## 📁 Updated Project Structure (Sprint 3)
 
-The project structure was expanded to include the new `websocket` module and key files were modified.
+
+# Sprint 1 Update: Backend Unit Testing (JUnit)
+
+This document details the new testing and quality assurance capabilities implemented during **Sprint 1** of the new project plan. The focus of this sprint was to validate the existing Java backend logic from the "Collector's Vault" project.
+
+## 🎯 Sprint 1 Objective
+
+The primary goal was to create a robust suite of unit tests for the Java service layer, ensuring our business logic (filters, offers, price updates) is reliable and preventing future regressions.
+
+* **Technology Added:** JUnit 5, Mockito, and JaCoCo (Maven Plugin).
+* **Target Coverage:** 90% code coverage on all tested services.
+
+## 🛠️ What Was Implemented
+
+1.  **Dependency Configuration:** The `pom.xml` was updated to include all necessary dependencies for testing:
+    * `junit-jupiter`: The core JUnit 5 testing framework.
+    * `mockito-core`: For creating "mock" objects (though not heavily used yet, it's now part of the stack).
+    * `jacoco-maven-plugin`: For generating code coverage reports.
+
+2.  **Test Directory:** The standard Maven test directory `src/test/java` was created to mirror the main source code.
+
+3.  **Unit Tests (JUnit):**
+    * `OfferServiceTest.java`: Validates that adding new offers and retrieving them by `itemId` works correctly.
+    * `ItemServiceTest.java`: This was the most critical test. It validates:
+        * **Price Filtering:** Correctly filters items based on `minPrice`, `maxPrice`, and a combination of both.
+        * **Edge Cases:** Handles `null` or empty filter parameters gracefully.
+        * **Price Updates:** Ensures the `updateItemPrice` method (used by WebSockets) correctly modifies the price in memory.
+
+---
+
+## ✅ Deliverables & Test Results
+
+### JUnit Test Execution
+
+All unit tests for the service layer were run successfully using the `mvn test` command.
+
+> ![alt text](image-17.png)
+>
+> ``
+
+### Code Coverage Report (JaCoCo)
+
+We successfully generated a code coverage report using `mvn jacoco:report` to verify that our tests meet the 90% coverage goal for the logic in `ItemService` and `OfferService`.
+
+> ![alt text](image-18.png)
+>![alt text](image-19.png)
+> ``
+
+### Issues & Resolutions Log
+
+* **Issue Found:** `ItemServiceTest` initially failed when testing price filters.
+* **Resolution:** The original `Item.java` model had `price` as a `String`. The tests forced us to refactor this (in Sprint 3 of the original plan) to a `double`, which was a critical prerequisite for filtering. The tests in this sprint *validated* that this refactor was successful.
+* **Issue Found:** `ItemService`'s `getAllItems` method (which now uses `double`) needed to be adjusted to correctly handle `null` or empty string inputs for `minPrice` and `maxPrice`.
+* **Resolution:** Added a helper method `parseDouble()` to the service to safely convert query parameters, preventing `NumberFormatExceptions`.

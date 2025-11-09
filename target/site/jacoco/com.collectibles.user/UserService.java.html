@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">challenge-6</a> &gt; <a href="index.source.html" class="el_package">com.collectibles.user</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.collectibles.user;
+
+import com.collectibles.utils.JsonUtil;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class UserService {
+
+    // Usamos ConcurrentHashMap para seguridad en un entorno web (múltiples hilos)
+    // Esto es sostenible: podemos reemplazar este Map por una conexión a BD
+    // sin cambiar el Controlador.
+<span class="nc" id="L13">    private final Map&lt;String, User&gt; userDatabase = new ConcurrentHashMap&lt;&gt;();</span>
+
+<span class="nc" id="L15">    public UserService() {</span>
+        // Datos de prueba
+<span class="nc" id="L17">        User testUser = new User(&quot;u1&quot;, &quot;rafael&quot;, &quot;rafael@test.com&quot;);</span>
+<span class="nc" id="L18">        userDatabase.put(testUser.getId(), testUser);</span>
+<span class="nc" id="L19">    }</span>
+
+    /**
+     * GET /users
+     */
+    public List&lt;User&gt; getAllUsers() {
+<span class="nc" id="L25">        return new ArrayList&lt;&gt;(userDatabase.values());</span>
+    }
+
+    /**
+     * GET /users/:id
+     */
+    public Optional&lt;User&gt; getUserById(String id) {
+<span class="nc" id="L32">        return Optional.ofNullable(userDatabase.get(id));</span>
+    }
+
+    /**
+     * POST /users (Decisión estándar de industria)
+     */
+    public User createUser(String jsonBody) {
+        // 1. Convertimos el JSON (String) a un objeto User
+        // Nota: El JSON de entrada no debe tener &quot;id&quot;
+<span class="nc" id="L41">        UserDTO createRequest = JsonUtil.fromJson(jsonBody, UserDTO.class);</span>
+        
+        // 2. Generamos un ID (la base de datos haría esto)
+<span class="nc" id="L44">        String id = &quot;u&quot; + (userDatabase.size() + 1);</span>
+        
+        // 3. Creamos el usuario
+<span class="nc" id="L47">        User newUser = new User(id, createRequest.getUsername(), createRequest.getEmail());</span>
+        
+        // 4. Guardamos
+<span class="nc" id="L50">        userDatabase.put(id, newUser);</span>
+<span class="nc" id="L51">        return newUser;</span>
+    }
+
+    /**
+     * PUT /users/:id
+     */
+    public Optional&lt;User&gt; updateUser(String id, String jsonBody) {
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (!userDatabase.containsKey(id)) {</span>
+<span class="nc" id="L59">            return Optional.empty(); // No se encontró</span>
+        }
+        
+<span class="nc" id="L62">        UserDTO updateRequest = JsonUtil.fromJson(jsonBody, UserDTO.class);</span>
+<span class="nc" id="L63">        User userToUpdate = userDatabase.get(id);</span>
+        
+        // Actualizamos los campos
+<span class="nc" id="L66">        userToUpdate.setUsername(updateRequest.getUsername());</span>
+<span class="nc" id="L67">        userToUpdate.setEmail(updateRequest.getEmail());</span>
+        
+<span class="nc" id="L69">        userDatabase.put(id, userToUpdate); // Re-guardamos</span>
+<span class="nc" id="L70">        return Optional.of(userToUpdate);</span>
+    }
+
+    /**
+     * DELETE /users/:id
+     */
+    public boolean deleteUser(String id) {
+<span class="nc" id="L77">        User removed = userDatabase.remove(id);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        return removed != null; // Retorna true si se borró algo</span>
+    }
+
+    /**
+     * OPTIONS /users/:id
+     */
+    public boolean userExists(String id) {
+<span class="nc" id="L85">        return userDatabase.containsKey(id);</span>
+    }
+
+    // DTO (Data Transfer Object) para la creación/actualización.
+    // Esto es una buena práctica para no exponer el modelo 'User' completo
+    // (ej. el 'id' no debe venir en la solicitud de creación).
+    private static class UserDTO {
+        private String username;
+        private String email;
+
+        public String getUsername() {
+<span class="nc" id="L96">            return username;</span>
+        }
+        public String getEmail() {
+<span class="nc" id="L99">            return email;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

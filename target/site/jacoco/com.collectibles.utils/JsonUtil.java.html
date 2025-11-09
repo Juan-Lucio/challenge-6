@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">challenge-6</a> &gt; <a href="index.source.html" class="el_package">com.collectibles.utils</a> &gt; <span class="el_source">JsonUtil.java</span></div><h1>JsonUtil.java</h1><pre class="source lang-java linenums">package com.collectibles.utils;
+
+import com.google.gson.Gson;
+import java.io.InputStreamReader; // &lt;&lt;&lt; CORRECCIÓN AQUÍ
+import java.lang.reflect.Type;   // &lt;&lt;&lt; CORRECCIÓN AQUÍ
+
+<span class="nc" id="L7">public class JsonUtil {</span>
+
+<span class="fc" id="L9">    private static final Gson gson = new Gson();</span>
+
+    // Convierte un objeto Java a un String JSON
+    public static String toJson(Object object) {
+<span class="nc" id="L13">        return gson.toJson(object);</span>
+    }
+
+    // Convierte un String JSON a un objeto Java (usando Class)
+    public static &lt;T&gt; T fromJson(String json, Class&lt;T&gt; clazz) {
+<span class="nc" id="L18">        return gson.fromJson(json, clazz);</span>
+    }
+
+    // &lt;&lt;&lt; CORRECCIÓN AQUÍ &gt;&gt;&gt;
+    // Sobrecarga del método para leer desde un InputStreamReader y usar un 'Type'
+    // Esto es lo que ItemService necesita para leer el archivo JSON
+    public static &lt;T&gt; T fromJson(InputStreamReader reader, Type type) {
+<span class="fc" id="L25">        return gson.fromJson(reader, type);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

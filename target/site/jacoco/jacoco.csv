@@ -1,0 +1,16 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+challenge-6,com.collectibles.exception,NotFoundException,4,0,0,0,2,0,1,0,1,0
+challenge-6,com.collectibles,App,160,0,6,0,45,0,10,0,7,0
+challenge-6,com.collectibles,WebController,176,0,4,0,44,0,7,0,5,0
+challenge-6,com.collectibles.item,ItemService.new TypeToken() {...},0,6,0,0,0,1,0,1,0,1
+challenge-6,com.collectibles.item,ItemService,51,116,1,11,16,25,4,14,3,9
+challenge-6,com.collectibles.item,Item,9,13,0,0,3,5,3,4,3,4
+challenge-6,com.collectibles.item,ItemController,37,0,0,0,14,0,5,0,5,0
+challenge-6,com.collectibles.user,UserService,117,0,4,0,23,0,9,0,7,0
+challenge-6,com.collectibles.user,User,33,0,0,0,14,0,7,0,7,0
+challenge-6,com.collectibles.user,UserController,119,0,4,0,36,0,11,0,9,0
+challenge-6,com.collectibles.user,UserService.UserDTO,6,0,0,0,2,0,2,0,2,0
+challenge-6,com.collectibles.websocket,PriceUpdateWebSocketHandler,82,0,4,0,21,0,8,0,6,0
+challenge-6,com.collectibles.utils,JsonUtil,12,10,0,0,3,2,3,2,3,2
+challenge-6,com.collectibles.offer,OfferService,0,32,0,0,0,8,0,4,0,4
+challenge-6,com.collectibles.offer,Offer,3,24,0,0,1,9,1,4,1,4
