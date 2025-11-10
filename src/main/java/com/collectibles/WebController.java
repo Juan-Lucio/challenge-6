@@ -1,21 +1,23 @@
 package com.collectibles;
 
-import com.collectibles.exception.NotFoundException;
-import com.collectibles.item.Item;
+import com.collectibles.item.Item; 
 import com.collectibles.item.ItemService;
 import com.collectibles.offer.Offer;
 import com.collectibles.offer.OfferService;
-// --- ¡CORRECCIÓN AQUÍ! SE AÑADIÓ ESTE IMPORT ---
 import com.collectibles.websocket.PriceUpdateWebSocketHandler;
-// ---
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import static spark.Spark.*;
 
+/**
+ * WebController
+ * SPRINT 2 REFACTOR: This controller now only handles the Server-Side Rendered (SSR)
+ * homepage. The item detail page is refactored to a static file + JS app.
+ * The POST route is updated to support this new JS app.
+ */
 public class WebController {
 
     private final ItemService itemService;
@@ -30,7 +32,10 @@ public class WebController {
 
     public void registerRoutes() {
 
-        // --- (GET / ACTUALIZADO PARA SPRINT 3.1) ---
+        /**
+         * Route: GET /
+         * (SSR) Renders the homepage with filters. This remains unchanged.
+         */
         get("/", (req, res) -> {
             String minPrice = req.queryParams("minPrice");
             String maxPrice = req.queryParams("maxPrice");
@@ -39,32 +44,31 @@ public class WebController {
             
             Map<String, Object> model = new HashMap<>();
             model.put("items", items);
-            
             model.put("minPrice", minPrice);
             model.put("maxPrice", maxPrice);
 
             return templateEngine.render(new ModelAndView(model, "index.mustache"));
         });
 
-        // --- (GET /:id sin cambios) ---
+        /**
+         * Route: GET /:id
+         * SPRINT 2 REFACTOR (Opción 3)
+         * This route no longer renders a template.
+         * It redirects to the static HTML shell of our new JS application.
+         * This decouples the frontend from the backend.
+         */
         get("/:id", (req, res) -> {
-            String id = req.params(":id");
-            Optional<Item> itemOpt = itemService.getItemById(id);
-
-            if (itemOpt.isEmpty()) {
-                throw new NotFoundException("Item with ID '" + id + "' not found.");
-            }
-
-            List<Offer> offers = offerService.getOffersByItemId(id);
-            
-            Map<String, Object> model = new HashMap<>();
-            model.put("item", itemOpt.get());
-            model.put("offers", offers);
-
-            return templateEngine.render(new ModelAndView(model, "item.mustache"));
+            // We pass the id in the URL so the JS app can read it
+            res.redirect("/item.html?id=" + req.params(":id"));
+            return null;
         });
 
-        // --- (POST /:id/offer ACTUALIZADO PARA SPRINT 3.2) ---
+        /**
+         * Route: POST /:id/offer
+         * SPRINT 2 REFACTOR (Opción 3)
+         * This route is now called via fetch() from the JS app.
+         * It must return JSON instead of redirecting.
+         */
         post("/:id/offer", (req, res) -> {
             String id = req.params(":id");
             String bidderName = req.queryParams("bidderName");
@@ -74,10 +78,11 @@ public class WebController {
             try {
                 offerAmount = Double.parseDouble(req.queryParams("offerAmount"));
             } catch (NumberFormatException e) {
-                res.redirect("/" + id);
-                return null;
+                res.status(400); // Bad Request
+                return "{\"error\":\"Invalid offer amount\"}";
             }
 
+            // Create and save the offer
             Offer newOffer = new Offer(bidderName, bidderEmail, id, offerAmount);
             offerService.addOffer(newOffer);
             
@@ -85,16 +90,15 @@ public class WebController {
                                ", Bidder: " + bidderName + 
                                ", Amount: $" + offerAmount);
 
-            // --- LÓGICA DE WEBSOCKET (SPRINT 3.2) ---
+            // Broadcast the WebSocket update
             boolean updated = itemService.updateItemPrice(id, offerAmount);
             if (updated) {
-                // Esta es la línea que fallaba (ahora funciona gracias al import)
                 PriceUpdateWebSocketHandler.broadcastPriceUpdate(id, offerAmount);
             }
-            // --- FIN LÓGICA WEBSOCKET ---
 
-            res.redirect("/" + id);
-            return null;
+            // Return a success JSON message
+            res.status(201); // 201 Created
+            return "{\"success\":true, \"newPrice\":" + offerAmount + "}";
         });
     }
 }

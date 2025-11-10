@@ -1,0 +1,15 @@
+{
+  "name": "challenge-6-frontend-tests",
+  "version": "1.0.0",
+  "description": "Jest tests for the Collector's Vault client-side app",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

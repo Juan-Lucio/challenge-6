@@ -402,3 +402,10 @@ footer {
     flex-basis: 150px;
     height: 50px; /* Match form-control padding+border */
 }
+/* --- SPRINT 2 (Refactor) Loading Spinner --- */
+.loading-spinner {
+    text-align: center;
+    padding: 80px;
+    font-size: 1.5em;
+    color: #888;
+}

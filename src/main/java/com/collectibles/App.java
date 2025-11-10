@@ -3,13 +3,13 @@ package com.collectibles;
 import com.collectibles.exception.NotFoundException;
 import com.collectibles.item.ItemController;
 import com.collectibles.item.ItemService;
+// --- IMPORT NUEVO ---
+import com.collectibles.offer.OfferController;
 import com.collectibles.offer.OfferService;
 import com.collectibles.user.UserController;
 import com.collectibles.user.UserService;
 import com.collectibles.utils.JsonUtil;
-// --- NUEVO IMPORT PARA WEBSOCKET ---
 import com.collectibles.websocket.PriceUpdateWebSocketHandler;
-// ---
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
 import java.util.Map;
@@ -20,32 +20,36 @@ public class App {
 
         staticFiles.location("/public");
         port(8080);
-
-        // --- SPRINT 3.2: INICIALIZAR WEBSOCKET ---
-        // Register the WebSocket handler at the /ws/price-updates path
         webSocket("/ws/price-updates", PriceUpdateWebSocketHandler.class);
-        // ---
 
         MustacheTemplateEngine templateEngine = new MustacheTemplateEngine();
 
+        // --- Instanciación de Servicios ---
         ItemService itemService = new ItemService();
         UserService userService = new UserService();
         OfferService offerService = new OfferService();
         
+        // --- Instanciación de Controladores ---
         ItemController itemController = new ItemController(itemService);
         UserController userController = new UserController(userService);
+        // --- (NUEVO) Instanciamos el OfferController ---
+        OfferController offerController = new OfferController(offerService);
+        // (ACTUALIZADO) WebController ahora solo necesita OfferService para el POST
         WebController webController = new WebController(itemService, offerService, templateEngine);
 
 
+        // --- SPRINT 1: API Routes ---
         path("/api", () -> {
             itemController.registerRoutes();
             userController.registerRoutes();
+            // --- (NUEVO) Registramos las rutas de la API de Ofertas ---
+            offerController.registerRoutes();
         });
 
+        // --- SPRINT 2: Web Routes ---
         webController.registerRoutes();
 
-
-        // --- MANEJADORES DE EXCEPCIONES Y FILTROS (SIN CAMBIOS) ---
+        // ... (Todos los manejadores de excepciones y filtros permanecen igual) ...
         
         after("/api/*", (req, res) -> {
             if (res.type() == null) {
@@ -55,6 +59,7 @@ public class App {
 
         exception(NotFoundException.class, (exception, req, res) -> {
             res.status(404);
+            // This now primarily serves the 404 for the homepage
             Map<String, Object> model = Map.of("message", exception.getMessage());
             res.body(templateEngine.render(new ModelAndView(model, "404.mustache")));
         });
