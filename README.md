@@ -305,78 +305,155 @@ We successfully generated a code coverage report using `mvn jacoco:report` to ve
 * **Issue Found:** `ItemService`'s `getAllItems` method (which now uses `double`) needed to be adjusted to correctly handle `null` or empty string inputs for `minPrice` and `maxPrice`.
 * **Resolution:** Added a helper method `parseDouble()` to the service to safely convert query parameters, preventing `NumberFormatExceptions`.
 
-# Sprint 2 Update: Frontend Refactor & Jest Testing
+# Project Update: Sprint 2 (Frontend Refactor & Jest Testing)
 
-This document details the work completed for **Sprint 2**, which involved a major architectural refactor (Option 3) and the implementation of a frontend testing suite (Jest).
+This document details the work completed during **Sprint 2** of the new project plan. The objective of this sprint was twofold:
 
-## 🎯 Sprint 2 Objectives
-
-1.  **Architectural Refactor (Opción 3):** Decouple the Item Detail page from the Java backend, converting it from Server-Side Rendered (SSR) to a Client-Side Rendered (CSR) JavaScript application.
-2.  **Frontend Testing (Teresa's Task):** Implement a comprehensive unit test suite for the new JavaScript application using **Jest**.
-3.  **Code Coverage:** Achieve at least **90%** test coverage for the new JavaScript module.
+1.  **Architectural Refactor (Option 3):** Decouple the Item Detail page from the Java backend, converting it from a Server-Side Rendered (SSR) page to a Client-Side Rendered (CSR) JavaScript application.
+2.  **Frontend Testing (Teresa's Task):** Implement a robust unit test suite for this new JavaScript application using **Jest**, with a 90% coverage target.
 
 ---
 
-## 🛠️ What Was Implemented
+## 1. Architectural Refactor (Option 3)
 
-### 1. Architectural Refactor: Decoupling the Frontend
-
-We successfully refactored the application into a hybrid model:
+To enable unit testing of the frontend, it was first necessary to decouple it from the backend.
 
 * **Backend (Java):**
-    * `WebController.java` was modified. The `GET /:id` route no longer renders a Mustache template. It now performs a simple **redirect** to the new static `item.html` file.
-    * The `POST /:id/offer` route was modified to **return JSON** instead of redirecting, making it a true API endpoint for the JavaScript app.
-    * A new `OfferController.java` was created to provide a `GET /api/offers/:itemId` endpoint, allowing the frontend to fetch offers on demand.
+    * `WebController.java` was modified: The `GET /:id` route no longer renders a Mustache template. It now performs a simple **redirect** to the new static `item.html` file.
+    * The `POST /:id/offer` route was modified to **return JSON** (instead of redirecting), turning it into a true API endpoint for the JavaScript app.
+    * An `OfferController.java` was created to expose a new `GET /api/offers/:itemId` endpoint, allowing the frontend to fetch the offer list on demand.
+
 * **Frontend (JavaScript):**
-    * `item.mustache` is no longer used for the detail page.
-    * `item.html` was created in `src/main/resources/public/`. This acts as a static "shell" for the application.
-    * `item-detail-app.js` was created. This is the new client-side "brain" that:
-        1.  Reads the item ID from the URL.
-        2.  Fetches all item and offer data from the `/api/...` endpoints.
-        3.  Renders the complete page HTML (item info, form, offer list) into the DOM.
-        4.  Handles the `submit` event for the offer form.
-        5.  Connects to the WebSocket for real-time price updates.
+    * The `item.mustache` file (for the detail page) has been **deprecated** and replaced.
+    * `item.html` was created in `src/main/resources/public/`. This acts as a static "shell" or container.
+    * `item-detail-app.js` was created. This file is now the client-side "brain" and is responsible for:
+        1.  Reading the item ID from the URL.
+        2.  Fetching data from the Java APIs (`/api/items/:id` and `/api/offers/:id`).
+        3.  Rendering all page HTML (item info, form, offer list) dynamically into the DOM.
+        4.  Handling the `submit` event for the offer form.
+        5.  Connecting to the WebSocket for real-time price updates.
 
-### 2. Frontend Unit Testing (Jest)
+### Refactor Result
 
-To test our new `item-detail-app.js` module, a complete Jest testing environment was configured.
+![alt text](image-21.png)
 
-* **Configuration:**
-    * `package.json` was created and configured with `npm install`.
-    * `jest`, `jest-environment-jsdom`, `babel-jest`, `@babel/core`, and `@babel/preset-env` were installed as dev dependencies.
-    * `babel.config.js` was created to handle modern `import/export` syntax.
-* **Mocking (`jest.setup.js`):**
-    * Created a global setup file to provide mocks for all browser-native APIs, including `fetch()` and `WebSocket()`.
-* **Tests (`item-detail-app.test.js`):**
-    * Wrote **17 unit tests** covering all functions in the module.
-    * **Pure Functions:** Tested the `renderOfferList` function with empty, null, and populated data.
-    * **DOM Rendering:** Tested `renderPage` to ensure all HTML elements are created correctly.
-    * **Data Fetching:** Tested `loadItemData`, including mock `fetch` calls for success, 404 item failures, and 404 offer failures.
-    * **Event Handling:** Tested `attachFormListener` to simulate form submissions for both success and failure cases.
-    * **WebSockets:** Tested `connectWebSocket` to ensure it connects and correctly updates the price on a valid message, while ignoring messages for other items.
+``
 
 ---
 
-## ✅ Deliverables & Test Results
+## 2. Unit Test Implementation (Jest)
 
-### Test Execution & Coverage
+With the frontend decoupled, a professional JavaScript testing environment was configured to validate the logic of the new `item-detail-app.js` module.
 
-All **17 tests passed** successfully. After testing all functions (including `init`), we achieved **94.80% statement coverage** and **100% line coverage**, surpassing the 90% sprint goal.
+* **Configuration:**
+    * `package.json` was created and dependencies were installed via `npm install`.
+    * `jest`, `jest-environment-jsdom`, `babel-jest`, `@babel/core`, and `@babel/preset-env` were installed as dev dependencies.
+    * A `babel.config.js` was created to transpile modern `import/export` (ESM) syntax.
 
-> ![alt text](image-20.png)
+* **Mocks (Simulations):**
+    * `jest.setup.js` was created to provide global mocks for browser-native APIs (`fetch` and `WebSocket`). This allows us to test network logic without a live server.
+
+* **Unit Tests:**
+    * **17 unit tests** were written in `item-detail-app.test.js` covering all critical logic.
+    * **Rendering:** Tests for `renderOfferList` and `renderPage` (handling success and empty/null lists).
+    * **Data Fetching:** Tests for `loadItemData`, simulating both successful (200) and failed (404) API responses.
+    * **Form Handling:** Tests for `attachFormListener`, simulating successful POSTs and network/validation failures (400).
+    * **WebSockets:** Tests for `connectWebSocket`, simulating price messages for the correct item and for different items.
+
+---
+
+## 3. Sprint Deliverables: Tests & Coverage
+
+### Successful Tests
+
+The test suite was completed and all debugging of async/config errors was resolved, resulting in 18 successful tests.
+
+![alt text](image-22.png)
+
+``
+
+### Code Coverage (>90%)
+
+The 90% coverage goal was successfully surpassed, achieving **96.25% statement coverage** on the `item-detail-app.js` module.
+
+![alt text](image-23.png)
+
+``
+
+---
+
+## 4. Technical Difficulties & Resolutions
+
+* **Problem 1: `SyntaxError: Cannot use import statement...`**
+    * **Solution:** Integrated Babel (`@babel/preset-env`) to transpile the modern ES Module syntax into a format Jest could understand (CommonJS).
+
+* **Problem 2: `TypeError: Cannot set properties of null...` (DOM Error)**
+    * **Solution:** Refactored the app (`item-detail-app.js`) to find DOM elements "lazily" (just-in-time inside each function) instead of on initial module load. This fixed the test isolation issue.
+
+* **Problem 3: Asynchronous tests were failing (Race Conditions)**
+    * **Solution:** Used `await new Promise(resolve => setTimeout(resolve, 0))` in tests for `attachFormListener`. This forces Jest to "wait one tick" for the event loop, allowing async `fetch` promises to resolve before assertions are checked.
+
+
+# Project Update: "Big Bang" Refactor (Database & Ranking)
+
+This document details the project's data layer migration (Proposal 2) and the implementation of new business and frontend features. This phase transforms the application from an in-memory prototype to a scalable, persistent application.
+
+## 1. Data Layer Migration (Backend)
+
+The entire in-memory storage logic (`Map`) has been replaced with a persistent **PostgreSQL** database, managed via **Jdbi**.
+
+* **`pom.xml`**: Added dependencies for `jdbi3-core`, `jdbi3-sqlobject`, and the `postgresql` driver.
+* **`DatabaseService.java`**: A new, centralized service was created to manage the database connection (`jdbc:postgresql://localhost:5432/collectibles`).
+* **`schema.sql`**: An SQL script was implemented to create the `items` and `offers` tables (using `NUMERIC` data types to support very large bids).
+* **Service Refactor**:
+    * **`ItemService.java`**: `loadItemsFromJson()` was removed. All methods (`getAllItems`, `getItemById`, `updateItemPrice`) were rewritten to execute SQL queries (e.g., `SELECT`, `UPDATE`).
+    * **`OfferService.java`**: The in-memory `Map` was removed. Methods (`addOffer`, `getOffersByItemId`) were rewritten to execute `INSERT` and `SELECT` queries against the database.
+
+## 2. New Business Logic: Offer Validation
+
+To align the project with a real-world auction model, a critical new business rule was implemented: **new offers must be higher than the current highest offer.**
+
+* **Backend (Java)**: The `OfferService.addOffer` method now runs a `SELECT MAX(amount)` query before inserting.
+    * If the new offer is too low, it throws a custom `InvalidOfferException`.
+    * The `WebController` catches this exception and returns a JSON error (`400 Bad Request`) to the frontend.
+* **Frontend (JavaScript)**: The `catch` block in `item-detail-app.js` (which we had already implemented) now handles this API error and displays a clear message to the user (e.g., "Error: Offer must be higher than...").
+
+> ![alt text](image-24.png)
 >
 > ``
 
-### Technical Difficulties & Resolutions Log
+## 3. New Feature: Ranking Page
 
-1.  **Issue:** `SyntaxError: Cannot use import statement...`
-    * **Difficulty:** Jest (running on Node.js) does not natively understand the `import/export` (ESM) syntax used in our JavaScript module.
-    * **Resolution:** Installed `babel-jest` and configured a `babel.config.js` to transpile the code "on-the-fly" into a format Jest understands (CommonJS).
+To drive "social proof" and urgency, a new page (`/ranking`) was created to display the top 10 highest offers across the entire site.
 
-2.  **Issue:** `TypeError: Cannot set properties of null...`
-    * **Difficulty:** Tests were failing because functions like `renderPage` tried to find DOM elements (`getElementById`) that didn't exist in Jest's test environment. The global `DOM` object in the app was being set to `null` before tests ran.
-    * **Resolution:** Refactored `item-detail-app.js` to remove the global `DOM` object. Functions were updated to find elements (e.g., `document.getElementById`) *when they are called*, not when the script is imported.
+* **Backend (Java)**:
+    * A new `RankedOffer.java` POJO was created to hold the joined data.
+    * The `OfferService.getTopRankedOffers()` method was added, which executes a complex SQL query with a `JOIN` (to get the item name) and `ORDER BY amount DESC`.
+    * The SQL alias ambiguity (`i.name AS "itemName"`) was fixed to ensure Jdbi mapping.
+* **Frontend (Mustache)**:
+    * The `ranking.mustache` template was created to render the list of offers.
+    * A "View Top Bids" link was added to the `index.mustache` header.
 
-3.  **Issue:** Asynchronous tests (like `attachFormListener`) were failing.
-    * **Difficulty:** The test would check the result (`expect(...)`) *before* the asynchronous `fetch` call had finished.
-    * **Resolution:** Used `await new Promise(resolve => setTimeout(resolve, 0))` after dispatching the event. This forces the test to "wait one tick" for the event loop, allowing the `async` function to complete before the assertions are checked.
+> ![alt text](image-25.png)
+>
+> ``
+
+## 4. UX Improvement: Currency Formatting
+
+To fix the issue of scientific notation (e.g., `1.0E7`), professional currency formatting was implemented.
+
+* **Ranking Page (Java/Mustache)**: A `getFormattedAmount()` method was added to the `RankedOffer.java` POJO, which formats the `double` as a currency String (e.g., `$10,000,000.00`) before Mustache renders it.
+* **Detail Page (JavaScript)**: A `formatCurrency()` helper function was added to `item-detail-app.js`. This function now formats all prices displayed in the DOM, both on the initial load (`renderPage`) and during WebSocket updates.
+
+> ![alt text](image-26.png)
+>
+> ``
+
+## 5. Impact on Testing (Next Steps)
+
+This "Big Bang" database migration was a major refactor. As a result, the unit tests we wrote in Sprints 1 and 2 are **completely invalidated**:
+
+* **JUnit Tests (Sprint 1):** Are now obsolete because they tested the in-memory `Map` logic that we just deleted.
+* **Jest Tests (Sprint 2):** Are now obsolete because the `item-detail-app.js` logic (specifically `attachFormListener`) must now handle the new `InvalidOfferException` (400 error).
+
+The **immediate next step** is to rewrite these test suites to work with the new database-driven architecture.
