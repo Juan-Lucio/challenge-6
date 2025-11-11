@@ -6,7 +6,7 @@
 
     <groupId>com.collectibles</groupId>
     <artifactId>challenge-6</artifactId>
-    <version>2.0-TESTING</version>
+    <version>3.0-DB_MIGRATION</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -22,6 +22,10 @@
         <junit.version>5.9.1</junit.version>
         <mockito.version>4.11.0</mockito.version>
         <jacoco.version>0.8.8</jacoco.version>
+        
+        <jdbi.version>3.38.2</jdbi.version>
+        <postgresql.driver.version>42.6.0</postgresql.driver.version>
+        <h2.db.version>2.2.224</h2.db.version>
     </properties>
 
     <dependencies>
@@ -45,13 +49,38 @@
             <artifactId>spark-template-mustache</artifactId>
             <version>${spark-mustache.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-core</artifactId>
+            <version>${jdbi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-sqlobject</artifactId>
+            <version>${jdbi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.driver.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.db.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope> </dependency>
-
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -71,7 +100,6 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-            
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -80,27 +108,15 @@
                     <mainClass>com.collectibles.App</mainClass>
                 </configuration>
             </plugin>
-            
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
+                    <execution><goals><goal>prepare-agent</goal></goals></execution>
+                    <execution><id>report</id><phase>test</phase><goals><goal>report</goal></goals></execution>
                 </executions>
             </plugin>
-            
         </plugins>
     </build>
 </project>

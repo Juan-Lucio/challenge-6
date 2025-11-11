@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Offers - Collector's Vault</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content container">
+            <a href="/" class="back-link">&larr; Back to Collection</a>
+            <h1>Top 10 Offers</h1>
+        </div>
+    </header>
+    <main class="container">
+        
+        <div class="ranking-list">
+            {{#offers}}
+            <div class="ranking-card">
+                <div class="ranking-amount">{{formattedAmount}}</div>
+                <div class="ranking-info">
+                    <h3>{{itemName}}</h3>
+                    <p>Bid by: {{name}} ({{email}})</p>
+                </div>
+            </div>
+            {{/offers}}
+            
+            {{^offers}}
+            <p class="no-offers">No offers have been made on any item yet.</p>
+            {{/offers}}
+        </div>
+        
+    </main>
+    <footer>
+        <p>&copy; 2023 Collector's Vault. All rights reserved.</p>
+    </footer>
+</body>
+</html>

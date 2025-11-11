@@ -304,3 +304,79 @@ We successfully generated a code coverage report using `mvn jacoco:report` to ve
 * **Resolution:** The original `Item.java` model had `price` as a `String`. The tests forced us to refactor this (in Sprint 3 of the original plan) to a `double`, which was a critical prerequisite for filtering. The tests in this sprint *validated* that this refactor was successful.
 * **Issue Found:** `ItemService`'s `getAllItems` method (which now uses `double`) needed to be adjusted to correctly handle `null` or empty string inputs for `minPrice` and `maxPrice`.
 * **Resolution:** Added a helper method `parseDouble()` to the service to safely convert query parameters, preventing `NumberFormatExceptions`.
+
+# Sprint 2 Update: Frontend Refactor & Jest Testing
+
+This document details the work completed for **Sprint 2**, which involved a major architectural refactor (Option 3) and the implementation of a frontend testing suite (Jest).
+
+## 🎯 Sprint 2 Objectives
+
+1.  **Architectural Refactor (Opción 3):** Decouple the Item Detail page from the Java backend, converting it from Server-Side Rendered (SSR) to a Client-Side Rendered (CSR) JavaScript application.
+2.  **Frontend Testing (Teresa's Task):** Implement a comprehensive unit test suite for the new JavaScript application using **Jest**.
+3.  **Code Coverage:** Achieve at least **90%** test coverage for the new JavaScript module.
+
+---
+
+## 🛠️ What Was Implemented
+
+### 1. Architectural Refactor: Decoupling the Frontend
+
+We successfully refactored the application into a hybrid model:
+
+* **Backend (Java):**
+    * `WebController.java` was modified. The `GET /:id` route no longer renders a Mustache template. It now performs a simple **redirect** to the new static `item.html` file.
+    * The `POST /:id/offer` route was modified to **return JSON** instead of redirecting, making it a true API endpoint for the JavaScript app.
+    * A new `OfferController.java` was created to provide a `GET /api/offers/:itemId` endpoint, allowing the frontend to fetch offers on demand.
+* **Frontend (JavaScript):**
+    * `item.mustache` is no longer used for the detail page.
+    * `item.html` was created in `src/main/resources/public/`. This acts as a static "shell" for the application.
+    * `item-detail-app.js` was created. This is the new client-side "brain" that:
+        1.  Reads the item ID from the URL.
+        2.  Fetches all item and offer data from the `/api/...` endpoints.
+        3.  Renders the complete page HTML (item info, form, offer list) into the DOM.
+        4.  Handles the `submit` event for the offer form.
+        5.  Connects to the WebSocket for real-time price updates.
+
+### 2. Frontend Unit Testing (Jest)
+
+To test our new `item-detail-app.js` module, a complete Jest testing environment was configured.
+
+* **Configuration:**
+    * `package.json` was created and configured with `npm install`.
+    * `jest`, `jest-environment-jsdom`, `babel-jest`, `@babel/core`, and `@babel/preset-env` were installed as dev dependencies.
+    * `babel.config.js` was created to handle modern `import/export` syntax.
+* **Mocking (`jest.setup.js`):**
+    * Created a global setup file to provide mocks for all browser-native APIs, including `fetch()` and `WebSocket()`.
+* **Tests (`item-detail-app.test.js`):**
+    * Wrote **17 unit tests** covering all functions in the module.
+    * **Pure Functions:** Tested the `renderOfferList` function with empty, null, and populated data.
+    * **DOM Rendering:** Tested `renderPage` to ensure all HTML elements are created correctly.
+    * **Data Fetching:** Tested `loadItemData`, including mock `fetch` calls for success, 404 item failures, and 404 offer failures.
+    * **Event Handling:** Tested `attachFormListener` to simulate form submissions for both success and failure cases.
+    * **WebSockets:** Tested `connectWebSocket` to ensure it connects and correctly updates the price on a valid message, while ignoring messages for other items.
+
+---
+
+## ✅ Deliverables & Test Results
+
+### Test Execution & Coverage
+
+All **17 tests passed** successfully. After testing all functions (including `init`), we achieved **94.80% statement coverage** and **100% line coverage**, surpassing the 90% sprint goal.
+
+> ![alt text](image-20.png)
+>
+> ``
+
+### Technical Difficulties & Resolutions Log
+
+1.  **Issue:** `SyntaxError: Cannot use import statement...`
+    * **Difficulty:** Jest (running on Node.js) does not natively understand the `import/export` (ESM) syntax used in our JavaScript module.
+    * **Resolution:** Installed `babel-jest` and configured a `babel.config.js` to transpile the code "on-the-fly" into a format Jest understands (CommonJS).
+
+2.  **Issue:** `TypeError: Cannot set properties of null...`
+    * **Difficulty:** Tests were failing because functions like `renderPage` tried to find DOM elements (`getElementById`) that didn't exist in Jest's test environment. The global `DOM` object in the app was being set to `null` before tests ran.
+    * **Resolution:** Refactored `item-detail-app.js` to remove the global `DOM` object. Functions were updated to find elements (e.g., `document.getElementById`) *when they are called*, not when the script is imported.
+
+3.  **Issue:** Asynchronous tests (like `attachFormListener`) were failing.
+    * **Difficulty:** The test would check the result (`expect(...)`) *before* the asynchronous `fetch` call had finished.
+    * **Resolution:** Used `await new Promise(resolve => setTimeout(resolve, 0))` after dispatching the event. This forces the test to "wait one tick" for the event loop, allowing the `async` function to complete before the assertions are checked.

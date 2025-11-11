@@ -15,17 +15,18 @@
     </header>
     
     <main id="app-container" class="container item-detail-page">
-        
         <div class="loading-spinner">
             <h2>Loading...</h2>
         </div>
-
     </main>
 
     <footer>
         <p>&copy; 2023 Collector's Vault. All rights reserved.</p>
     </footer>
 
-    <script src="/js/item-detail-app.js" defer></script>
+    <script type="module">
+      import { init } from '/js/item-detail-app.js';
+      init();
+    </script>
 </body>
 </html>

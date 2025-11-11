@@ -1,9 +1,12 @@
 package com.collectibles;
 
+import com.collectibles.exception.NotFoundException;
+// --- ¡LA CORRECCIÓN ESTÁ AQUÍ! ---
 import com.collectibles.item.Item; 
 import com.collectibles.item.ItemService;
 import com.collectibles.offer.Offer;
 import com.collectibles.offer.OfferService;
+import com.collectibles.offer.RankedOffer;
 import com.collectibles.websocket.PriceUpdateWebSocketHandler;
 import spark.ModelAndView;
 import spark.TemplateEngine;
@@ -12,12 +15,6 @@ import java.util.List;
 import java.util.Map;
 import static spark.Spark.*;
 
-/**
- * WebController
- * SPRINT 2 REFACTOR: This controller now only handles the Server-Side Rendered (SSR)
- * homepage. The item detail page is refactored to a static file + JS app.
- * The POST route is updated to support this new JS app.
- */
 public class WebController {
 
     private final ItemService itemService;
@@ -34,40 +31,48 @@ public class WebController {
 
         /**
          * Route: GET /
-         * (SSR) Renders the homepage with filters. This remains unchanged.
+         * (SSR) Renders the homepage with filters.
          */
         get("/", (req, res) -> {
             String minPrice = req.queryParams("minPrice");
             String maxPrice = req.queryParams("maxPrice");
-
-            List<Item> items = itemService.getAllItems(minPrice, maxPrice);
+            
+            // This line (List<Item>) is why the import is needed
+            List<Item> items = itemService.getAllItems(minPrice, maxPrice); 
             
             Map<String, Object> model = new HashMap<>();
             model.put("items", items);
             model.put("minPrice", minPrice);
             model.put("maxPrice", maxPrice);
-
             return templateEngine.render(new ModelAndView(model, "index.mustache"));
         });
 
+        // The specific /ranking route MUST come BEFORE the wildcard /:id route
+        /**
+         * Route: GET /ranking
+         * Displays the new server-side rendered ranking page.
+         */
+        get("/ranking", (req, res) -> {
+            List<RankedOffer> topOffers = offerService.getTopRankedOffers();
+            Map<String, Object> model = new HashMap<>();
+            model.put("offers", topOffers);
+            return templateEngine.render(new ModelAndView(model, "ranking.mustache"));
+        });
+        
         /**
          * Route: GET /:id
-         * SPRINT 2 REFACTOR (Opción 3)
-         * This route no longer renders a template.
-         * It redirects to the static HTML shell of our new JS application.
-         * This decouples the frontend from the backend.
+         * SPRINT 2 REFACTOR (Option 3)
+         * Redirects to the static HTML shell of our new JS application.
          */
         get("/:id", (req, res) -> {
-            // We pass the id in the URL so the JS app can read it
             res.redirect("/item.html?id=" + req.params(":id"));
             return null;
         });
 
         /**
          * Route: POST /:id/offer
-         * SPRINT 2 REFACTOR (Opción 3)
-         * This route is now called via fetch() from the JS app.
-         * It must return JSON instead of redirecting.
+         * SPRINT 2 REFACTOR (Option 3)
+         * Handles the form submission from the JS app.
          */
         post("/:id/offer", (req, res) -> {
             String id = req.params(":id");
@@ -82,7 +87,7 @@ public class WebController {
                 return "{\"error\":\"Invalid offer amount\"}";
             }
 
-            // Create and save the offer
+            // Create and save the offer (this now throws an error if low)
             Offer newOffer = new Offer(bidderName, bidderEmail, id, offerAmount);
             offerService.addOffer(newOffer);
             
@@ -96,7 +101,6 @@ public class WebController {
                 PriceUpdateWebSocketHandler.broadcastPriceUpdate(id, offerAmount);
             }
 
-            // Return a success JSON message
             res.status(201); // 201 Created
             return "{\"success\":true, \"newPrice\":" + offerAmount + "}";
         });

@@ -1,4 +1,5 @@
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\offer\OfferService.java
+C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\offer\RankedOffer.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\user\User.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\App.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\user\UserService.java
@@ -6,9 +7,11 @@ C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\websocket\Pri
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\utils\JsonUtil.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\item\Item.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\user\UserController.java
+C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\database\DatabaseService.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\item\ItemController.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\WebController.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\offer\Offer.java
+C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\exception\InvalidOfferException.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\item\ItemService.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\offer\OfferController.java
 C:\Users\DELL\Documents\challenge-6\src\main\java\com\collectibles\exception\NotFoundException.java
