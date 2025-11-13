@@ -457,3 +457,155 @@ This "Big Bang" database migration was a major refactor. As a result, the unit t
 * **Jest Tests (Sprint 2):** Are now obsolete because the `item-detail-app.js` logic (specifically `attachFormListener`) must now handle the new `InvalidOfferException` (400 error).
 
 The **immediate next step** is to rewrite these test suites to work with the new database-driven architecture.
+
+# Collector's Vault: Real-Time Auction Web App
+
+This project is a full-stack, real-time auction website built with Java Spark (backend) and a decoupled JavaScript frontend. It features a persistent PostgreSQL database, live price updates via WebSockets, and a hybrid rendering model (SSR for the homepage, CSR for the item detail page).
+
+This project was developed by refactoring an in-memory prototype to use a persistent database and implementing a full suite of unit tests for both the backend (JUnit) and frontend (Jest).
+
+## 🛠️ Tech Stack
+
+* **Backend:** Java 17, Spark Framework, Jdbi 3, PostgreSQL
+* **Frontend:** HTML5, CSS3, JavaScript (ESM)
+* **Real-time:** Spark WebSockets
+* **Testing (Java):** JUnit 5, H2 Database (for tests)
+* **Testing (JS):** Jest, JSDOM, Babel
+
+## 🚀 How to Run the Project
+
+### Prerequisite 1: PostgreSQL Setup (One-time)
+
+This application requires a running PostgreSQL server.
+
+1.  **Install PostgreSQL** (if not already installed).
+2.  **Create the Database:** Open the `psql` (SQL Shell) and run:
+    ```sql
+    CREATE DATABASE collectibles;
+    ```
+3.  **Set Your Password:** Open the file `src/main/java/com/collectibles/database/DatabaseService.java` and change the `password` variable (line 20) to your own PostgreSQL password.
+
+### Prerequisite 2: Node.js Setup (One-time)
+
+You must have Node.js and `npm` installed.
+
+1.  Open a terminal in the project root.
+2.  Run `npm install` to install Jest, Babel, and other dependencies.
+
+### Running the Application
+
+1.  Open a terminal in the project root (`challenge-6`).
+2.  Run the Maven command:
+    ```bash
+    mvn clean compile exec:java
+    ```
+3.  The server will start. It will connect to your PostgreSQL database, automatically run the `schema.sql` to create the tables, and seed the `items` table from `items.json`.
+4.  Open your browser and go to: **`http://localhost:8080/`**
+
+---
+
+## 🧪 How to Run the Tests
+
+This project has two separate test suites.
+
+### 1. JavaScript / Frontend Tests (Jest)
+
+These tests cover the client-side JavaScript application (`item-detail-app.js`) and have **96.25% coverage**.
+
+**To run the Jest tests:**
+```bash
+npm test
+
+```
+---
+
+### 4. Architecture Diagrams (PDF Content)
+
+You can copy the code below into a text file and use a tool like the "Mermaid Live Editor" (or a VS Code plugin) to generate the visuals. Save them as a PDF to complete your deliverable.
+
+#### Diagram 1: System Architecture (Mermaid)
+
+```mermaid
+graph TD
+    subgraph "User's Browser"
+        A[Client-Side App: item-detail-app.js]
+        B[SSR Pages: Homepage / Ranking]
+    end
+
+    subgraph "Java Spark Server (localhost:8080)"
+        C[WebController (SSR)] -- Renders --> D[Mustache Templates]
+        E[API Controllers (JSON)]
+        F[WebSocket Handler]
+        
+        C -- Calls --> G[Services: Item, Offer, User]
+        E -- Calls --> G
+        F -- Calls --> G
+        
+        G -- Uses --> H[Jdbi (SQL)]
+    end
+
+    subgraph "Database Server"
+        I[PostgreSQL: 'collectibles' DB]
+    end
+
+    A -- (1. Fetch /api) --> E
+    B -- (Rendered by) --> C
+    
+    A -- (2. POST Offer) --> E
+    
+    A -- (3. Open WS) <--> F
+    
+    H <--> I
+```
+
+#### Diagram 1: System Architecture (Mermaid)
+
+sequenceDiagram
+    participant User
+    participant JS_App as "item-detail-app.js"
+    participant WebController as "WebController (POST /:id/offer)"
+    participant OfferService
+    participant ItemService
+    participant WebSocket
+    participant Database as "PostgreSQL DB"
+
+    User->>JS_App: 1. Clicks "Submit Offer"
+    JS_App->>WebController: 2. fetch() POST request (with form data)
+    
+    WebController->>OfferService: 3. addOffer(newOffer)
+    
+    OfferService->>Database: 4. SELECT MAX(amount)
+    Database-->>OfferService: 5. Returns current max ($1000)
+    
+    alt Offer is too low (e.g., $900)
+        OfferService-->>WebController: 6a. throws InvalidOfferException
+        WebController-->>JS_App: 7a. Returns 400 Bad Request (JSON Error)
+        JS_App->>User: 8a. Displays "Error: Offer must be higher than $1000"
+    else Offer is valid (e.g., $1100)
+        OfferService->>Database: 6b. INSERT INTO offers (...)
+        WebController->>ItemService: 7b. updateItemPrice(id, $1100)
+        ItemService->>Database: 8b. UPDATE items SET price = ...
+        
+        WebController->>WebSocket: 9b. broadcastPriceUpdate(id, $1100)
+        WebSocket-->>JS_App: 10b. Pushes [PRICE_UPDATE] message
+        JS_App->>User: 11b. Updates "Current Value" DOM to $1,100.00
+        
+        WebController-->>JS_App: 12b. Returns 201 Created (JSON Success)
+        JS_App->>JS_App: 13b. Refreshes offer list (fetch /api/offers)
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+<!-- [MermaidChart: 4943aac9-9293-4560-9d50-ea2608b0f437] -->
+    end

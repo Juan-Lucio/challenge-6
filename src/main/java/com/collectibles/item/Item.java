@@ -12,7 +12,7 @@ public class Item {
     private double price;
     private String imageUrl;
 
-    // No-arg constructor required by Jdbi
+    /** No-arg constructor required by Jdbi */
     public Item() {}
     
     // Getters

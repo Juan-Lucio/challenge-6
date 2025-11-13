@@ -1,13 +1,12 @@
 package com.collectibles.offer;
 
 import java.sql.Timestamp;
-// --- Imports para formatear moneda ---
 import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
  * Model (POJO) for an Offer.
- * Refactored for Jdbi mapping.
+ * Refactored to be a "Java Bean" for Jdbi mapping.
  */
 public class Offer {
 
@@ -18,10 +17,10 @@ public class Offer {
     private double amount;
     private Timestamp created_at;
 
-    // No-arg constructor required by Jdbi
+    /** No-arg constructor required by Jdbi */
     public Offer() {}
     
-    // Constructor for creating new offers
+    /** Constructor for creating new offers */
     public Offer(String name, String email, String itemId, double amount) {
         this.name = name;
         this.email = email;
@@ -29,9 +28,8 @@ public class Offer {
         this.amount = amount;
     }
 
-    // --- (NUEVO GETTER DE FORMATO) ---
     /**
-     * Formats the 'amount' double into a proper currency String.
+     * Formats the 'amount' double into a proper currency String for Mustache.
      * (e.g., 501.0 -> $501.00)
      */
     public String getFormattedAmount() {

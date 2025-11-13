@@ -3,7 +3,6 @@ package com.collectibles.offer;
 import com.collectibles.exception.InvalidOfferException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.StatementException;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +20,8 @@ public class OfferService {
 
     /**
      * Retrieves all offers for a specific item, ordered highest first.
+     * @param itemId The ID of the item.
+     * @return A List of offers.
      */
     public List<Offer> getOffersByItemId(String itemId) {
         return jdbi.withHandle(handle -> 
@@ -58,7 +59,6 @@ public class OfferService {
                 handle.createUpdate(
                     "INSERT INTO offers (item_id, name, email, amount) " +
                     "VALUES (:item_id, :name, :email, :amount)")
-                    // bindBean(newOffer) es más limpio que bindear uno por uno
                     .bindBean(newOffer)
                     .execute();
             });
@@ -67,12 +67,9 @@ public class OfferService {
             if (e.getCause() instanceof InvalidOfferException) {
                 throw (InvalidOfferException) e.getCause();
             }
-            // Otherwise, rethrow the database error
             throw e;
         }
     }
-
-// ... (El resto de OfferService.java: constructor, getOffersByItemId, addOffer) ...
 
     /**
      * NEW FUNCTIONALITY (Ranking Page)
@@ -80,14 +77,12 @@ public class OfferService {
      * joining with the items table to get the item name.
      */
     public List<RankedOffer> getTopRankedOffers() {
-        
-        // --- ¡LA CORRECCIÓN ESTÁ AQUÍ! ---
-        // Damos alias a AMBAS columnas 'name' para evitar ambigüedad.
+        // Use "itemName" alias to respect Jdbi mapping
         String sql = "SELECT " +
                      "  o.amount, " +
-                     "  o.name AS \"name\", " +  // Nombre del ofertante
+                     "  o.name AS \"name\", " +  // Bidder name
                      "  o.email, " +
-                     "  i.name AS \"itemName\" " + // Nombre del ítem
+                     "  i.name AS \"itemName\" " + // Item name
                      "FROM offers o " +
                      "JOIN items i ON o.item_id = i.id " +
                      "ORDER BY o.amount DESC " +
@@ -100,7 +95,3 @@ public class OfferService {
         );
     }
 }
-
-
-
-

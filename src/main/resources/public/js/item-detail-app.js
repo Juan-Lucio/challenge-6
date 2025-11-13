@@ -1,13 +1,13 @@
 /*
  * item-detail-app.js
- * REFACTORED: Functions now find their own DOM elements
- * and format currency correctly.
+ * Main JavaScript application for the item detail page (Opción 3).
+ * Handles fetching data, rendering the DOM, and WebSocket connection.
  */
 
-// --- (NUEVA FUNCIÓN DE AYUDA) ---
 /**
  * Helper function to format a number into USD currency.
- * @param {number} amount The number to format.
+ * @param {number | string} amount The number to format.
+ * @returns {string} A USD currency string (e.g., "$1,234.56").
  */
 function formatCurrency(amount) {
     if (typeof amount !== 'number') {
@@ -22,10 +22,12 @@ function formatCurrency(amount) {
 }
 
 /**
- * Entry point.
+ * Main entry point for the application.
+ * Reads the item ID from the URL and initializes the data load and WebSocket.
  */
 export function init() {
     console.log("Item Detail App Initialized.");
+    
     const appContainer = document.getElementById('app-container');
     const urlParams = new URLSearchParams(window.location.search);
     const currentItemId = urlParams.get('id');
@@ -40,7 +42,7 @@ export function init() {
 }
 
 /**
- * Fetches all item and offer data from the APIs
+ * Fetches all item and offer data from the APIs in parallel.
  * @param {string} itemId The ID of the item to fetch
  */
 export async function loadItemData(itemId) {
@@ -81,14 +83,20 @@ export function connectWebSocket(itemId) {
     socket.onclose = () => console.log("[WebSocket] Connection closed.");
     socket.onerror = (err) => console.error("[WebSocket] Error:", err);
 
+    /**
+     * Handles incoming messages from the WebSocket server.
+     * @param {MessageEvent} event The WebSocket message event.
+     */
     socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
         
+        // Check if the update is for the item we are currently viewing
         if (message.type === "PRICE_UPDATE" && message.itemId === itemId) {
             console.log("[WebSocket] Price update received!", message);
+            
             const priceEl = document.getElementById("price-display");
             if (priceEl) {
-                // --- ¡CORRECCIÓN! Usamos el formateador ---
+                // Format the new price and update the DOM
                 priceEl.textContent = formatCurrency(message.newPrice);
             }
         }
@@ -96,8 +104,13 @@ export function connectWebSocket(itemId) {
     return socket;
 }
 
+
+// --- MODULE: Rendering ---
+
 /**
  * Renders the entire page content into the app container.
+ * @param {object} item - The item object from the API.
+ * @param {Array} offers - The list of offer objects from the API.
  */
 export function renderPage(item, offers) {
     const headerTitle = document.getElementById('item-name-header');
@@ -110,7 +123,7 @@ export function renderPage(item, offers) {
             <div class="item-image-large">
                 <img src="${item.imageUrl}" alt="${item.name}">
             </div>
-            <div class="item-text-info">
+            <div class.="item-text-info">
                 <p class="item-description">${item.description}</p>
                 <h3 class="current-price">Current Value: 
                     <span id="price-display">${formatCurrency(item.price)}</span>
@@ -128,14 +141,16 @@ export function renderPage(item, offers) {
     `;
     
     if (appContainer) appContainer.innerHTML = html;
+    
+    // Attach listener to the newly rendered form
     attachFormListener(item.id);
 }
 
 /**
  * Renders the HTML for the offer form.
+ * @param {string} itemId - The item's ID.
  */
 export function renderOfferForm(itemId) {
-    // (Esta función no cambia)
     return `
     <div class="offer-section">
         <h2>Make an Offer</h2>
@@ -161,6 +176,7 @@ export function renderOfferForm(itemId) {
 
 /**
  * Renders the HTML for the list of offers.
+ * @param {Array} offers - The list of offer objects.
  */
 export function renderOfferList(offers) {
     if (!offers || offers.length === 0) {
@@ -176,8 +192,14 @@ export function renderOfferList(offers) {
     `).join('');
 }
 
+
+// --- MODULE: Event Handlers ---
+
 /**
  * Attaches the 'submit' event listener to the offer form.
+ * Handles the form submission via fetch, provides user feedback,
+ * and refreshes the offer list.
+ * @param {string} itemId The ID of the item this form is for.
  */
 export function attachFormListener(itemId) {
     const form = document.getElementById('offer-form');
@@ -190,21 +212,24 @@ export function attachFormListener(itemId) {
         if (formMessage) formMessage.textContent = 'Submitting...';
 
         try {
+            // 1. Send the form data to the backend
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: new URLSearchParams(new FormData(form))
             });
 
+            // 2. Check for business logic errors (e.g., "Offer too low")
             if (!response.ok) {
                 const errData = await response.json();
                 throw new Error(errData.error || "Submission failed");
             }
 
+            // 3. Handle success
             const result = await response.json();
             if (formMessage) formMessage.textContent = 'Offer submitted successfully!';
             form.reset();
             
-            // Manually refresh the offer list
+            // 4. Manually refresh the offer list to show the new one
             const offersRes = await fetch(`/api/offers/${itemId}`);
             const offers = await offersRes.json();
             
@@ -212,6 +237,7 @@ export function attachFormListener(itemId) {
             if (offersContainer) offersContainer.innerHTML = renderOfferList(offers);
 
         } catch (error) {
+            // 5. Handle all errors (network, 400, 500)
             if (formMessage) {
                 formMessage.textContent = `Error: ${error.message}`;
                 formMessage.style.color = '#d9534f';
